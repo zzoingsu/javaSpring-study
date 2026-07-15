@@ -20,6 +20,7 @@ public class Article {
         this.title = title;
         this.content = content;
     }
+
     @Override
     public String toString() {
         return "Article[" +
