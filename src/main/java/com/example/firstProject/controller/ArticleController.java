@@ -38,7 +38,7 @@ public class ArticleController {
         return "articles/new";
     }
 
-@GetMapping("/articles/{id}")
+    @GetMapping("/articles/{id}")
     public String show(@PathVariable Long id, Model model) {
         log.info("id=" + id);
         //1. id를 조회해 데이터 가져오기
