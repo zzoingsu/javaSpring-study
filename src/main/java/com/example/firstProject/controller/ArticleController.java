@@ -35,7 +35,7 @@ public class ArticleController {
         // 2. repository로 엔티티를 DB에 저장
         Article saved = articleRepossitory.save(article);
         System.out.println(saved.toString());
-        return "articles/new";
+        return "redirect:/articles/" + saved.getId();
     }
 
     @GetMapping("/articles/{id}")
