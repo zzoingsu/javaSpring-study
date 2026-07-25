@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -57,5 +56,19 @@ public class ArticleController {
         model.addAttribute("articleList", articleEntityList);
         //3. 뷰 페이지 설정하기
         return "articles/index";
+    }
+    @GetMapping("/articles/{id}/edit")
+    public String edit(@PathVariable Long id, Model model) {
+        Article articleEntity = articleRepossitory.findById(id).orElse(null);
+        model.addAttribute("article", articleEntity);
+        return "articles/edit";
+    }
+    @PostMapping ("articles/update")
+    public String update(ArticleForm form) {
+    Article articleEntity = form.toEntity();
+    Article target = articleRepossitory.findById(articleEntity.getId()).orElse(null);
+    if(target != null) {
+        articleRepossitory.save(articleEntity);
+    } return "redirect:/articles/" + articleEntity.getId();
     }
 }
