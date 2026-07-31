@@ -45,8 +45,18 @@ public class ArticleApiController {
             log.info("잘못된 요청 id:{}, article:{}", id, article.toString());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+        target.patch(article);
         Article updated = articleRepository.save(article);
         return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
     // DELETE
+    @DeleteMapping("/api/articles/{id}")
+    public ResponseEntity<Article> delete(@PathVariable Long id) {
+        Article target = articleRepository.findById(id).orElse(null);
+        if(target==null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        articleRepository.delete(target);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
