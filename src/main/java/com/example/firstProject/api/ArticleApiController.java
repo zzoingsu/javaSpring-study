@@ -3,6 +3,7 @@ package com.example.firstProject.api;
 import com.example.firstProject.dto.ArticleForm;
 import com.example.firstProject.entity.Article;
 import com.example.firstProject.repository.ArticleRepository;
+import com.example.firstProject.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,48 +16,40 @@ import java.util.List;
 @RestController
 public class ArticleApiController {
     @Autowired
+    public ArticleService articleService;
+
     private ArticleRepository articleRepository;
     // GET
     @GetMapping("/api/articles")
     public List<Article> index() {
-        return articleRepository.findAll();
+        return articleService.index();
     }
     @GetMapping("/api/articles/{id}")
     public Article show(@PathVariable Long id) {
-        return articleRepository.findById(id).orElse(null);
+        return articleService.show(id);
     }
     // POST
     @PostMapping("/api/articles")
-    public Article create (@RequestBody ArticleForm dto) {
-        Article article = dto.toEntity();
-        return articleRepository.save(article);
+    public ResponseEntity<Article> create (@RequestBody ArticleForm dto) {
+        Article created = articleService.create(dto);
+        return (created!=null) ?
+                ResponseEntity.status(HttpStatus.OK).body(created) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
     // PATCH
     @PatchMapping("/api/articles/{id}")
     public ResponseEntity<Article> update(@PathVariable Long id, @RequestBody ArticleForm dto) {
-        //1. DTO -> 엔티티 변환하기
-        Article article = dto.toEntity();
-        log.info(article.toString());
-        //2. target 조회하기
-        Article target = articleRepository.findById(id).orElse(null);
-        //3. 잘못된 요청 처리하기
-        if(target==null || article.getId() != id) {
-            //400 잘못된 요청 응답
-            log.info("잘못된 요청 id:{}, article:{}", id, article.toString());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-        target.patch(article);
-        Article updated = articleRepository.save(article);
-        return ResponseEntity.status(HttpStatus.OK).body(updated);
+       Article updated = articleService.update(id, dto);
+       return (updated!=null) ?
+           ResponseEntity.status(HttpStatus.OK).body(updated) :
+           ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
     // DELETE
     @DeleteMapping("/api/articles/{id}")
     public ResponseEntity<Article> delete(@PathVariable Long id) {
-        Article target = articleRepository.findById(id).orElse(null);
-        if(target==null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-        articleRepository.delete(target);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        Article deleted = articleService.delete(id);
+        return (deleted != null) ?
+                ResponseEntity.status(HttpStatus.OK).body(deleted) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
