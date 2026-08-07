@@ -7,8 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import java.util.List;
 
@@ -50,6 +54,17 @@ public class ArticleService {
         }
         articleRepository.delete(target);
         return target;
+    }
+    @Transactional
+    public List<Article> createdList(List<ArticleForm> dtos) {
+        List<Article> articleList = dtos.stream()
+                .map(dto -> dto.toEntity())
+                .collect(Collectors.toList());
+        articleList.stream()
+                .forEach(article -> articleRepository.save(article));
+        articleRepository.findById(-1l)
+                .orElseThrow(() -> new IllegalArgumentException("결재 실패"));
+        return articleList;
     }
 
 }
