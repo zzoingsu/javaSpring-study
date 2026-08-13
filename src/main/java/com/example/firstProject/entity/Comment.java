@@ -27,6 +27,33 @@ public class Comment {
 
     public static Comment createComment(Article article, CommentDto dto) {
         // 예외 발생
+        if(dto.getId() != null) {
+            throw new IllegalArgumentException("댓글 생성 실패!, 댓글의 아이디가 없어야합니다");
+        }
+        if(dto.getArticleId() != article.getId()) {
+            throw new IllegalArgumentException("댓글 생성 실패!, 게시물의 아이디가 잘못됐습니다");
+        }
         // 엔티티 생성 및 반환
+        return new Comment(
+                dto.getId(),
+                article,
+                dto.getNickname(),
+                dto.getBody()
+        );
+    }
+
+    public void patch(CommentDto dto) {
+        // 예외 발생
+        if(this.id != dto.getId()) {
+            throw new IllegalArgumentException("댓글 수정 실패! 잘못된 id가 입력됐습니다");
+        }
+        // 객체 갱신
+        if(dto.getNickname() != null) {
+            this.nickname = dto.getNickname();
+        }
+        if(dto.getBody() != null) {
+            this.body = dto.getBody();
+        }
+
     }
 }
